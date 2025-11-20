@@ -1,26 +1,77 @@
-Este es el repositorio del grupo 7, para el desarrollo de actividades de laboratorio de Aprendizaje automático para la maestría en Inteligencia Aritifical de la UEES. 
-Enlace a la presentaciones por video: https://drive.google.com/file/d/1QdEz-JwAnBmeuKWIntWXZh4erYeC8BLR/view?usp=sharing
-1. El Contexto de los Datos
-El siguiente trabajo se basa en el análisis del archivo Arduino.CSV. Este conjunto de datos contiene una captura continua de lecturas de múltiples sensores (sensor de luz, sensor de sonido, giroscopio y acelerómetro) conectados a un microcontrolador Arduino.
+README – Proyecto de Explicabilidad (XAI) y Análisis de Sensores Arduino
 
-El objetivo es analizar este flujo de datos para entender el comportamiento del dispositivo y cómo sus sensores reaccionaban al entorno durante el período de medición.
+Descripción del Proyecto
+Este proyecto implementa un modelo de Machine Learning aplicado al análisis de datos reales obtenidos desde sensores Arduino (ruido, luz, acelerómetro y giroscopio). El objetivo principal es:
 
-2. Enfoque del Análisis
-Aunque se capturaron múltiples lecturas, nuestro análisis se concentrará en las tres columnas más relevantes para el movimiento y la orientación:
+Detectar anomalías en los sensores.
 
-Giroscopio: Este sensor es fundamental para entender la orientación del dispositivo en el espacio (por ejemplo, si estaba plano, de lado o en vertical).
+Evaluar la transparencia mediante técnicas de Explicabilidad (XAI).
 
-Acelerómetro: Este sensor mide la aceleración (cambios de velocidad). Es clave para determinar si el dispositivo estaba en reposo o en movimiento (como al ser agitado o transportado).
+Identificar posibles sesgos del entorno (baja luz, ruido alto).
 
-Tiempo: Nos permite contextualizar cuándo ocurrió cada evento.
+Aplicar técnicas de mitigación y evaluación ética.
 
-3. ¿Por qué usar Aprendizaje No Supervisado?
-El gran desafío de este conjunto de datos es que, si bien tenemos miles de lecturas de sensores, no tenemos etiquetas que nos digan qué estaba haciendo el dispositivo en cada momento. Es un flujo de datos en bruto; no sabemos cuándo estaba "sobre la mesa", "en la mano de alguien" o "siendo agitado".
+Este repositorio contiene los notebooks, visualizaciones, métricas, código de entrenamiento y experimentos de explicabilidad desarrollados durante el curso de Modelos Avanzados en Análisis de Datos.
+** Estructura del Repositorio**
 
-Aquí es donde radica la importancia de los métodos de aprendizaje no supervisado:
+📁 Proyecto_XAI_Arduino/ │ ├── data/ │ ├── ArduinoSensorValues.csv │ ├── notebooks/ │ ├── Analisis_Sensores_Arduino_XAI.ipynb │ ├── SHAP_LIME_Explicabilidad.ipynb │ ├── Sesgos_y_Fairness.ipynb │ ├── images/ │ ├── shap_summary.png │ ├── lime_example.png │ ├── correlacion_sensores.png │ ├── matriz_confusion.png │ ├── README.md └── reporte/ ├── Informe_Final_XAI.pdf └── Presentación.pptx
 
-En lugar de entrenar un modelo con respuestas correctas (que no tenemos), usaremos algoritmos de clustering (como K-Means y DBSCAN) para que descubran automáticamente los patrones y estados ocultos en los datos.
+Metodología del Proyecto
+El flujo metodológico seguido es:
 
-En esencia, le pedimos a la máquina que analice todas las lecturas del giroscopio y el acelerómetro y las agrupe en "estados" coherentes (por ejemplo, "Estado 1: quieto y plano", "Estado 2: en movimiento", "Estado 3: sostenido en vertical", etc.).
+Carga y revisión inicial del dataset
+Lectura de 113 registros provenientes del Arduino.
 
-Finalmente, usaremos técnicas de reducción de dimensionalidad (PCA y t-SNE) para visualizar y validar qué tan distintos y bien definidos son esos estados que hemos descubierto.
+Limpieza de valores nulos.
+
+Análisis exploratorio de sensores: ruido, luz, aceleración y gravedad.
+
+Ingeniería de etiquetas
+Se generó una variable objetivo Is_Anomaly utilizando el método IQR aplicado a la columna decibles.
+
+Definición de “atributos sensibles”
+Para replicar metodologías de fairness, se crearon grupos de riesgo:
+
+grupo_luz_baja → condiciones de baja iluminación
+
+grupo_ruido_alto → condiciones de alto ruido
+
+Entrenamiento del modelo supervisado
+Modelo seleccionado: Random Forest (200 árboles) Justificación:
+
+Robusto al ruido
+
+Maneja no linealidades
+
+Buen rendimiento en sensores
+
+Explicabilidad (XAI)
+Se implementaron dos técnicas:
+
+✔ SHAP
+
+BeeSwarm global
+
+Importancia media de variables
+
+Explicación del impacto de cada característica
+
+✔ LIME
+
+Explicaciones individuales
+
+Identificación de variables determinantes en un caso específico
+
+Evaluación de sesgos
+Se midió la tasa de anomalías predichas por:
+
+baja luz vs luz normal
+
+alto ruido vs ruido normal
+
+Mitigación de sesgo
+Eliminación de variables sensibles
+
+Fairlearn (Demographic Parity con Logistic Regression)
+
+Comparación antes/después
